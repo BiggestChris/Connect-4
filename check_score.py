@@ -1,5 +1,5 @@
 
-
+'''
 def check(input_array, x, y):
     if (input_array[x][y] != 1):
         return
@@ -17,8 +17,12 @@ def check(input_array, x, y):
 array_1 = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
 array_2 = [[0,0,0,1],[0,0,0,1],[0,0,0,1],[0,0,0,1]]
 array_3 = [[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+'''
 
-new_array = [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+
+new_array = [[0,0,'A','A','A','A'],[0,0,0,'B','A','A'],[0,0,0,'A','A','A'],[0,0,0,0,0,0],[0,0,0,0,'A','A'],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+
+
 
 '''
   A B C D E F G
@@ -43,6 +47,7 @@ score_diagonal_down_right = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]               # st
 
 i = 6
 j = 7
+
 
 # populate score_row
 
@@ -81,15 +86,71 @@ for col_num in range((j - 4) + 1):
 
 for col_num in range((j - 4) + 1):
     for row_num in range((i - 4) + 1):
-        score_diagonal_up_right[col_num][row_num] = {
+        score_diagonal_down_right[col_num][row_num] = {
             'A': 0,
             'B': 0,
             'Score': 0
         }
 
 
+def check_columns(array):
+    for j in range(len(array)):
+        for i in range((len(array[j]) - 3)):
+            for z in range(4):
+                if array[j][i + z] == 'A':
+                    score_column[j][i]['A'] += 1
+                elif array[j][i + z] == 'B':
+                    score_column[j][i]['B'] += 1
+            if score_column[j][i]['A'] != 0 and score_column[j][i]['B'] != 0:
+                score_column[j][i]['Score'] = 'X'
+            else:
+                score_column[j][i]['Score'] = score_column[j][i]['A'] - score_column[j][i]['B']
 
 
+def check_rows(array):
+    for j in range(len(array) - 3):
+        for i in range(len(array[j])):
+            for z in range(4):
+                if array[j + z][i] == 'A':
+                    score_row[j][i]['A'] += 1
+                elif array[j + z][i ] == 'B':
+                    score_row[j][i]['B'] += 1
+            if score_row[j][i]['A'] != 0 and score_row[j][i]['B'] != 0:
+                score_row[j][i]['Score'] = 'X'
+            else:
+                score_row[j][i]['Score'] = score_row[j][i]['A'] - score_row[j][i]['B']
+
+
+def check_diagonals_up_right(array):
+    for j in range(len(array) - 3):
+        for i in range(len(array[j]) - 3):
+            for z in range(4):
+                # print('i = ', i,', j = ', j, ', z = ', z)
+                # print('Value is ', array[j + z][i + 3 - z])
+                if array[j + z][i + 3 - z] == 'A':
+                    score_diagonal_up_right[j][i]['A'] += 1
+                elif array[j + z][i + 3 - z] == 'B':
+                    score_diagonal_up_right[j][i]['B'] += 1
+                # print(score_diagonal_up_right[j][i]['A'])
+            if score_diagonal_up_right[j][i]['A'] != 0 and score_diagonal_up_right[j][i]['B'] != 0:
+                score_diagonal_up_right[j][i]['Score'] = 'X'
+            else:
+                score_diagonal_up_right[j][i]['Score'] = score_diagonal_up_right[j][i]['A'] - score_diagonal_up_right[j][i]['B']
+
+
+def check_diagonals_down_right(array):
+    for j in range(len(array) - 3):
+        for i in range(len(array[j]) - 3):
+            for z in range(4):
+                if array[j + z][i + z] == 'A':
+                    score_diagonal_down_right[j][i]['A'] += 1
+                elif array[j + z][i + z] == 'B':
+                    score_diagonal_down_right[j][i]['B'] += 1
+                # print(score_diagonal_down_right[j][i]['A'])
+            if score_diagonal_down_right[j][i]['A'] != 0 and score_diagonal_down_right[j][i]['B'] != 0:
+                score_diagonal_down_right[j][i]['Score'] = 'X'
+            else:
+                score_diagonal_down_right[j][i]['Score'] = score_diagonal_down_right[j][i]['A'] - score_diagonal_down_right[j][i]['B']
 
 
 '''
@@ -108,13 +169,9 @@ for i in range(4):
         }
 '''
 
-count = 0
-score = 0
-
-for i in range(4):
-    for j in range (4):
-        check(array_2, i, j)
-        count += 1
-
-print(count)
-print(score)
+# print(new_array)
+check_columns(new_array)
+check_rows(new_array)
+check_diagonals_up_right(new_array)
+check_diagonals_down_right(new_array)
+print(score_column)
