@@ -170,8 +170,21 @@ for i in range(4):
 '''
 
 # print(new_array)
-check_columns(new_array)
-check_rows(new_array)
-check_diagonals_up_right(new_array)
-check_diagonals_down_right(new_array)
-print(score_column)
+# check_columns(new_array)
+# check_rows(new_array)
+# check_diagonals_up_right(new_array)
+# check_diagonals_down_right(new_array)
+# print(score_column)
+
+# 6 rows by 7 columns
+
+i = 6
+j = 7
+
+dummy_array = [[0 for x in range(i)] for y in range(j)]
+dummy_score_row = [[0 for x in range(len(dummy_array[0]))] for y in range(len(dummy_array) - 3)]
+dummy_score_column = [[0 for x in range(len(dummy_array[0]) - 3)] for y in range(len(dummy_array))]
+dummy_score_diagonal_left = [[0 for x in range(len(dummy_array[0]) - 3)] for y in range(len(dummy_array) - 3)]
+dummy_score_diagonal_right = [[0 for x in range(len(dummy_array[0]) - 3)] for y in range(len(dummy_array) - 3)]
+
+print(dummy_score_diagonal_right)
