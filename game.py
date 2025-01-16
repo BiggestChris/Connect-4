@@ -67,7 +67,7 @@ class Board:
 
     def add_coin(self, number, player):
         # print(self.grid[(number - 1)])
-        for i in range(self.columns):
+        for i in range(self.rows):
             if self.grid[(number - 1)][(-1 - i)] == 0:      # Will assume player treats game as one-indexed
                 self._grid[(number - 1)][(-1 - i)] = player
                 self._check_rows(self.grid)
@@ -99,12 +99,16 @@ class Board:
             } for x in range(self._rows)] for y in range(self._columns - 3)]
 
     def _check_rows(self, array):
+        print('Starting check rows')
+        self._score_row = self.__initialise_score_row()
         for j in range(len(array) - 3):
             for i in range(len(array[j])):
                 for z in range(4):
                     # print('j = ', j, 'i = ', i, 'z = ', z)
                     if array[j + z][i] == 'A':
+                        # print('j = ', j, 'i = ', i, 'z = ', z, 'Array-point before update',self._score_row[j][i]['A'])
                         self._score_row[j][i]['A'] += 1
+                        # print('j = ', j, 'i = ', i, 'z = ', z, 'Array-point after update',self._score_row[j][i]['A'])
                     elif array[j + z][i ] == 'B':
                         # print(self.score_row[j][0])
                         self._score_row[j][i]['B'] += 1
@@ -126,6 +130,7 @@ class Board:
             } for x in range(self._rows - 3)] for y in range(self._columns)]
 
     def _check_columns(self, array):
+        self._score_column = self.__initialise_score_column()
         for j in range(len(array)):
             for i in range(len(array[j]) - 3):
                 for z in range(4):
@@ -153,6 +158,7 @@ class Board:
             } for x in range(self._rows - 3)] for y in range(self._columns - 3)]
 
     def _check_diagonals_up_right(self, array):
+        self._score_diagonal_up_right = self.__initialise_score_diagonal_up_right()
         for j in range(len(array) - 3):
             for i in range(len(array[j]) - 3):
                 for z in range(4):
@@ -180,6 +186,7 @@ class Board:
             } for x in range(self._rows - 3)] for y in range(self._columns - 3)]
 
     def _check_diagonals_down_right(self, array):
+        self._score_diagonal_down_right = self.__initialise_score_diagonal_down_right()
         for j in range(len(array) - 3):
             for i in range(len(array[j]) - 3):
                 for z in range(4):
@@ -199,10 +206,9 @@ class Board:
 b1 = Board(7,6)
 
 b1.add_coin(4, 'B')
+b1.add_coin(4, 'A')
+b1.add_coin(4, 'B')
 
 print(b1.grid)
 
-print(b1.score_row)
-print(b1.score_column)
-print(b1.score_diagonal_down_right)
 print(b1.score_diagonal_up_right)
