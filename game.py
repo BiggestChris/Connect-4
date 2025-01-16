@@ -202,6 +202,18 @@ class Board:
                     self._score_diagonal_down_right[j][i]['Score'] = self._score_diagonal_down_right[j][i]['A'] - self._score_diagonal_down_right[j][i]['B']
 
 
+class ComputerPlayer:
+    #TODO: Initialise Computer state
+    #TODO: Determine how to make a move - use Scoring logic of board
+    #TODO: Add in further decision logic - fool's mate workaround
+
+
+class Game:
+    #TODO: Initialise the game state (board and player/s)
+    #TODO: Set rules for how to play - i.e. takke it in turns between player and computer
+    #TODO: Identify when the game has been won and declare accordingly (and stop the game)
+
+
 
 b1 = Board(7,6)
 
@@ -211,4 +223,4 @@ b1.add_coin(4, 'B')
 
 print(b1.grid)
 
-print(b1.score_diagonal_up_right)
+print(b1.score_diagonal_down_right)
