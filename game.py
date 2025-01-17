@@ -1,4 +1,5 @@
 from tabulate import tabulate
+import random
 
 class Board:
     # Initialise the object based on number of columns and rows
@@ -99,7 +100,7 @@ class Board:
             } for x in range(self._rows)] for y in range(self._columns - 3)]
 
     def _check_rows(self, array):
-        print('Starting check rows')
+        # print('Starting check rows')
         self._score_row = self.__initialise_score_row()
         for j in range(len(array) - 3):
             for i in range(len(array[j])):
@@ -203,24 +204,73 @@ class Board:
 
 
 class ComputerPlayer:
-    #TODO: Initialise Computer state
+    def __init__(self, difficulty):
+        self.difficulty = random
+
+    @property
+    def difficulty(self):
+        return self._difficulty
+
+    @difficulty.setter
+    def difficulty(self, difficulty):
+        self._difficulty = difficulty
+
+    def make_move(self, board):
+        valid_columns = [col for col in range(len(board.grid)) if board.grid[col][0] == 0]
+        # print(valid_columns)
+        return random.choice(valid_columns)
+        
     #TODO: Determine how to make a move - use Scoring logic of board
     #TODO: Add in further decision logic - fool's mate workaround
 
 
 class Game:
     #TODO: Initialise the game state (board and player/s)
-    #TODO: Set rules for how to play - i.e. takke it in turns between player and computer
+    def __init__(self):
+        self.board = Board(7,6)
+        self.computer = ComputerPlayer('random')
+        self.win = False
+        self.play()
+
+    #TODO: Set rules for how to play - i.e. take it in turns between player and computer
+    def play(self):
+        while self.win == False:
+            player_move = int(input('Input your move as a column, 1-7: '))
+            self.board.add_coin(player_move, 'A')
+            print(self.board)
+            self.check_win()
+            if self.win == True: # Feels like there should be a cleaner way to write this
+                continue
+            computer_move = self.computer.make_move(self.board)
+            self.board.add_coin(computer_move, 'B')
+            print(self.board)
+            self.check_win()
+        else:
+            print('Game over')
+
     #TODO: Identify when the game has been won and declare accordingly (and stop the game)
+    def check_win(self):
+        for j in range(len(self.board.score_row)):
+            for i in range(len(self.board.score_row[j])):
+                if self.board.score_row[j][i]['Score'] == 4:
+                    self.win = True
+                    break
+        for j in range(len(self.board.score_column)):
+            for i in range(len(self.board.score_column[j])):
+                if self.board.score_column[j][i]['Score'] == 4:
+                    self.win = True
+                    break
+        for j in range(len(self.board.score_diagonal_up_right)):
+            for i in range(len(self.board.score_diagonal_up_right[j])):
+                if self.board.score_diagonal_up_right[j][i]['Score'] == 4:
+                    self.win = True
+                    break
+        for j in range(len(self.board.score_diagonal_down_right)):
+            for i in range(len(self.board.score_diagonal_down_right[j])):
+                if self.board.score_diagonal_down_right[j][i]['Score'] == 4:
+                    self.win = True
+                    break
 
 
+game = Game()
 
-b1 = Board(7,6)
-
-b1.add_coin(4, 'B')
-b1.add_coin(4, 'A')
-b1.add_coin(4, 'B')
-
-print(b1.grid)
-
-print(b1.score_diagonal_down_right)
