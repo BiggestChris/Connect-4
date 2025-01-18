@@ -244,6 +244,30 @@ class ComputerPlayer:
         Create a copy of the board to experiment with, and read score off of that
     '''
 
+    def check_for_win(self, board):
+        column_wins = []
+        directions = ['row', 'column', 'diagonal_up_right', 'diagonal_down_right']
+        
+        for column_index in range(len(board.grid)):
+            dummy_board = copy.deepcopy(board)
+            dummy_board.add_coin((column_index + 1), 'B')
+            for direction in directions:
+                score_attribute = getattr(dummy_board, f'score_{direction}')
+                # print(score_attribute)
+                for column_cell in score_attribute:
+                    for row_cell in column_cell:
+                        if row_cell['B'] == 4:
+                            column_wins.append(column_index)
+                            break  # Breaks out of the innermost loop (row_cell)
+                    else:
+                        continue  # Continues to the next column_cell
+                    break  # Breaks out of the column_cell loop
+                else:
+                    continue  # Continues to the next direction in total_score
+                break  # Breaks out of the direction loop
+        print(column_wins)
+
+
     def check_move(self, board):
         # dummy_board = copy.deepcopy(board)
         choice_scores = []
@@ -268,7 +292,8 @@ class ComputerPlayer:
                         if row_cell['Score'] != 'X':
                             total_score[key] += row_cell['Score']
             print(sum(total_score.values()))
-            choice_scores.append(total_score.values())  
+            choice_scores.append(total_score.values())
+        print(choice_scores)
 
         '''
         for j in range(len(dummy_board.score_row)):
@@ -368,8 +393,13 @@ class Game:
 
 board = Board(7, 6)
 computer = ComputerPlayer('random')
-board.add_coin(3, 'A')
-board.add_coin(3, 'A')
-board.add_coin(3, 'A')
+board.add_coin(3, 'B')
+board.add_coin(3, 'B')
+board.add_coin(3, 'B')
+board.add_coin(2, 'B')
+board.add_coin(2, 'B')
+board.add_coin(4, 'B')
+board.add_coin(4, 'B')
+board.add_coin(4, 'B')
 print(board)
-computer.check_move(board)
+computer.check_for_win(board)
