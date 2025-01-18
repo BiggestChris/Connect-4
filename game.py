@@ -244,6 +244,7 @@ class ComputerPlayer:
         Create a copy of the board to experiment with, and read score off of that
     '''
 
+    
     def check_for_win(self, board):
         column_wins = []
         directions = ['row', 'column', 'diagonal_up_right', 'diagonal_down_right']
@@ -266,6 +267,33 @@ class ComputerPlayer:
                     continue  # Continues to the next direction in total_score
                 break  # Breaks out of the direction loop
         print(column_wins)
+
+
+
+    def check_for_lose(self, board):
+        column_loses = []
+        directions = ['row', 'column', 'diagonal_up_right', 'diagonal_down_right']
+        
+        for column_index in range(len(board.grid)):
+            dummy_board = copy.deepcopy(board)
+            dummy_board.add_coin((column_index + 1), 'A')
+            for direction in directions:
+                score_attribute = getattr(dummy_board, f'score_{direction}')
+                # print(score_attribute)
+                for column_cell in score_attribute:
+                    for row_cell in column_cell:
+                        if row_cell['A'] == 4:
+                            column_loses.append(column_index)
+                            break  # Breaks out of the innermost loop (row_cell)
+                    else:
+                        continue  # Continues to the next column_cell
+                    break  # Breaks out of the column_cell loop
+                else:
+                    continue  # Continues to the next direction in total_score
+                break  # Breaks out of the direction loop
+        print(column_loses)
+
+
 
 
     def check_move(self, board):
@@ -401,5 +429,9 @@ board.add_coin(2, 'B')
 board.add_coin(4, 'B')
 board.add_coin(4, 'B')
 board.add_coin(4, 'B')
+board.add_coin(6, 'A')
+board.add_coin(6, 'A')
+board.add_coin(6, 'A')
 print(board)
 computer.check_for_win(board)
+computer.check_for_lose(board)
