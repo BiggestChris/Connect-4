@@ -1,5 +1,6 @@
 from tabulate import tabulate
 import random
+import copy
 
 class Board:
     # Initialise the object based on number of columns and rows
@@ -221,6 +222,83 @@ class ComputerPlayer:
         return random.choice(valid_columns)
         
     #TODO: Determine how to make a move - use Scoring logic of board
+    '''
+    Pesudo-code:
+    1. Read current state of the board
+    2. Will any moves give a Win state?
+        a. Measure score metrics after each move that could be made
+        b. If any Turn+1 score metrics give a Win state, then play in that column
+        c. If multiple do, pick one of them at random
+    3. Will any moves (or absence of) give a Lost state / Win state to opponent?
+        a. Measure score metrics as if current opponent could make a move
+        b. If any Turn+1-opponent score metrics give them a Win state, then play in that column
+        c. If multiple do, pick one of them at random (no-win situation)
+    4. What move will maximise score?
+        a. Measure score metrics after each move that could be made
+        b. Which move will maximise own score/minimise opponent score? (Offensive vs Defensive?)
+            i. Check that the move will not create a potential Win state for the opponent
+        c. If multiple with same sccore, pick one of them at random
+
+
+    How to measure potential board state?
+        Create a copy of the board to experiment with, and read score off of that
+    '''
+
+    def check_move(self, board):
+        # dummy_board = copy.deepcopy(board)
+        choice_scores = []
+        for column_index in range(len(board.grid)):
+            total_score = {
+                'row': 0,
+                'column': 0,
+                'diagonal_up_right': 0,
+                'diagonal_down_right': 0
+            }
+            dummy_board = copy.deepcopy(board)
+            dummy_board.add_coin((column_index + 1), 'B')
+            # print(dummy_board.score_row)
+            # print(dummy_board.score_column)
+            # print(dummy_board.score_diagonal_up_right)
+            # print(dummy_board.score_diagonal_down_right)
+            for key in total_score.keys():
+                score_attribute = getattr(dummy_board, f'score_{key}')
+                # print(score_attribute)
+                for column_cell in score_attribute:
+                    for row_cell in column_cell:
+                        if row_cell['Score'] != 'X':
+                            total_score[key] += row_cell['Score']
+            print(sum(total_score.values()))
+            choice_scores.append(total_score.values())  
+
+        '''
+        for j in range(len(dummy_board.score_row)):
+            for i in range(len(dummy_board.score_row[j])):
+                if dummy_board.score_row[j][i]['Score'] == 'X':
+                    pass
+                else:
+                    total_score['row'] += dummy_board.score_row[j][i]['Score']
+        for j in range(len(dummy_board.score_column)):
+            for i in range(len(dummy_board.score_column[j])):
+                if dummy_board.score_column[j][i]['Score'] == 'X':
+                    pass
+                else:
+                    total_score['column'] += dummy_board.score_column[j][i]['Score']
+        for j in range(len(dummy_board.score_diagonal_up_right)):
+            for i in range(len(dummy_board.score_diagonal_up_right[j])):
+                if dummy_board.score_diagonal_up_right[j][i]['Score'] == 'X':
+                    pass
+                else:
+                    total_score['diagonal_up_right'] += dummy_board.score_diagonal_up_right[j][i]['Score']
+        for j in range(len(dummy_board.score_diagonal_down_right)):
+            for i in range(len(dummy_board.score_diagonal_down_right[j])):
+                if dummy_board.score_diagonal_down_right[j][i]['Score'] == 'X':
+                    pass
+                else:
+                    total_score['diagonal_down_right'] += dummy_board.score_diagonal_down_right[j][i]['Score']
+        print(total_score['row'] + total_score['column'] + total_score['diagonal_up_right'] + total_score['diagonal_down_right'])
+        '''
+        
+
     #TODO: Add in further decision logic - fool's mate workaround
 
 
@@ -241,6 +319,7 @@ class Game:
             self.check_win()
             if self.win == True: # Feels like there should be a cleaner way to write this
                 continue
+            print('Computer moving')
             computer_move = self.computer.make_move(self.board)
             self.board.add_coin(computer_move, 'B')
             print(self.board)
@@ -250,6 +329,18 @@ class Game:
 
     #TODO: Identify when the game has been won and declare accordingly (and stop the game)
     def check_win(self):
+        directions = ['row', 'column', 'diagonal_up_right', 'diagonal_down_right']
+
+        for direction in directions:
+            score_attribute = getattr(self.board, f'score_{direction}')
+            for column_cell in score_attribute:
+                for row_cell in column_cell:
+                    if row_cell['Score'] == 4:
+                        self.win = True
+                        break
+
+
+        '''
         for j in range(len(self.board.score_row)):
             for i in range(len(self.board.score_row[j])):
                 if self.board.score_row[j][i]['Score'] == 4:
@@ -270,7 +361,15 @@ class Game:
                 if self.board.score_diagonal_down_right[j][i]['Score'] == 4:
                     self.win = True
                     break
+        '''
 
 
-game = Game()
+# game = Game()
 
+board = Board(7, 6)
+computer = ComputerPlayer('random')
+board.add_coin(3, 'A')
+board.add_coin(3, 'A')
+board.add_coin(3, 'A')
+print(board)
+computer.check_move(board)
