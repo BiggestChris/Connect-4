@@ -206,7 +206,7 @@ class Board:
 
 class ComputerPlayer:
     def __init__(self, difficulty):
-        self.difficulty = random
+        self.difficulty = difficulty
 
     @property
     def difficulty(self):
@@ -219,7 +219,25 @@ class ComputerPlayer:
     def make_move(self, board):
         valid_columns = [col for col in range(len(board.grid)) if board.grid[col][0] == 0]
         # print(valid_columns)
-        return random.choice(valid_columns)
+        match self.difficulty:
+            case 'random':
+                return random.choice(valid_columns)
+            case 'normal':
+                wins = self.check_for_win(board)
+                if wins:
+                    # print('Pick win')
+                    return random.choice(wins)
+                loses = self.check_for_lose(board)
+                if loses:
+                    print('Pick avoid lose')
+                    return random.choice(loses)
+                fools = self.check_for_fool(board)
+                if fools:
+                    return random.choice(fools)
+                moves = self.check_move(board)
+                print(moves)
+                return moves
+
         
     #TODO: Determine how to make a move - use Scoring logic of board
     '''
@@ -266,7 +284,8 @@ class ComputerPlayer:
                 else:
                     continue  # Continues to the next direction in total_score
                 break  # Breaks out of the direction loop
-        print(column_wins)
+        # print(column_wins)
+        return column_wins
 
 
 
@@ -291,9 +310,35 @@ class ComputerPlayer:
                 else:
                     continue  # Continues to the next direction in total_score
                 break  # Breaks out of the direction loop
-        print(column_loses)
+        # print(column_loses)
+        return column_loses
 
-
+    def check_for_fool(self, board):
+        moves = []
+        for z in range(len(board.grid)):
+            try:
+                if (board.grid[z][-1] == 'A'
+                and board.grid[z + 1][-1] == 'A'
+                and (
+                    (
+                        (board.grid[z - 1][-1] == 0 
+                        and board.grid[z - 2][-1] == 0
+                        and board.grid[z + 2][-1] == 0
+                        )
+                    )
+                    or
+                    (
+                        (board.grid[z - 1][-1] == 0 
+                        and board.grid[z + 2][-1] == 0
+                        and board.grid[z + 3][-1] == 0
+                        )
+                    )
+                )):
+                    moves.append(z - 1)
+                    moves.append(z + 2)
+            except IndexError:
+                continue
+        return moves
 
 
     def check_move(self, board):
@@ -319,9 +364,20 @@ class ComputerPlayer:
                     for row_cell in column_cell:
                         if row_cell['Score'] != 'X':
                             total_score[key] += row_cell['Score']
-            print(sum(total_score.values()))
-            choice_scores.append(total_score.values())
-        print(choice_scores)
+            print('Column is: ', column_index, 'Score is: ', sum(total_score.values()))
+            # If move causes a lose add a very high number
+            losses = self.check_for_lose(dummy_board)
+            if losses:
+                choice_scores.append(sum(total_score.values()) + 1000)
+            else: 
+                choice_scores.append(sum(total_score.values()))
+        # print(choice_scores)
+
+        # check this move won't cause a lose
+        # new_dummy_board = copy.deepycopy(dummy_board.add_coin((choice_scores.index(min(choice_scores)) + 1), 'B'))
+        # self.check_for_lose(new_dummy_board)
+
+        return choice_scores.index(min(choice_scores))
 
         '''
         for j in range(len(dummy_board.score_row)):
@@ -359,12 +415,20 @@ class Game:
     #TODO: Initialise the game state (board and player/s)
     def __init__(self):
         self.board = Board(7,6)
-        self.computer = ComputerPlayer('random')
+        self.computer = ComputerPlayer('normal')
         self.win = False
         self.play()
 
     #TODO: Set rules for how to play - i.e. take it in turns between player and computer
     def play(self):
+        if random.choice([1,2]) == 2:
+            print('Computer starts')
+            computer_move = self.computer.make_move(self.board)
+            self.board.add_coin(computer_move + 1, 'B')
+            print(self.board)
+            self.check_win()
+        else:
+            print('Player starts')
         while self.win == False:
             player_move = int(input('Input your move as a column, 1-7: '))
             self.board.add_coin(player_move, 'A')
@@ -374,7 +438,7 @@ class Game:
                 continue
             print('Computer moving')
             computer_move = self.computer.make_move(self.board)
-            self.board.add_coin(computer_move, 'B')
+            self.board.add_coin(computer_move + 1, 'B')
             print(self.board)
             self.check_win()
         else:
@@ -388,7 +452,7 @@ class Game:
             score_attribute = getattr(self.board, f'score_{direction}')
             for column_cell in score_attribute:
                 for row_cell in column_cell:
-                    if row_cell['Score'] == 4:
+                    if row_cell['Score'] == 4 or row_cell['Score'] == -4:
                         self.win = True
                         break
 
@@ -417,21 +481,12 @@ class Game:
         '''
 
 
-# game = Game()
+game = Game()
 
+'''
 board = Board(7, 6)
 computer = ComputerPlayer('random')
-board.add_coin(3, 'B')
-board.add_coin(3, 'B')
-board.add_coin(3, 'B')
-board.add_coin(2, 'B')
-board.add_coin(2, 'B')
-board.add_coin(4, 'B')
-board.add_coin(4, 'B')
-board.add_coin(4, 'B')
-board.add_coin(6, 'A')
-board.add_coin(6, 'A')
-board.add_coin(6, 'A')
 print(board)
 computer.check_for_win(board)
 computer.check_for_lose(board)
+'''
