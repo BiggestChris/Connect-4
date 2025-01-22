@@ -1,11 +1,13 @@
 import pygame
 import sys
 
-class Game_Instance:
+class Visual_Game_Instance:
     def __init__(self):
         # Game settings
         self.ROWS = 6 # TODO: Link to row variable
         self.COLS = 7 # TODO: Link to column variable
+
+        # Game visuals
         self.GRID_SIZE = 100 # Should be static, width/height of each cell in the grid
         self.WIDTH = self.COLS * self.GRID_SIZE # Setting width to be used for screen
         self.HEIGHT = (self.ROWS + 1) * self.GRID_SIZE # Setting height to be used for screen, want black row at top
@@ -22,9 +24,9 @@ class Game_Instance:
         pygame.display.set_caption("Connect 4")
 
         # Game state
-        self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)]
+        self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)] # TODO: Ensure this only relates to rendering
         self.running = True
-        self.current_player = 1 # Player 1 starts
+        self.current_player = 1 # Player 1 starts #TODO: Have this dictated by game logic
 
 
     def draw_board(self):
@@ -134,5 +136,5 @@ class Game_Instance:
 
 
 if __name__ == "__main__":
-    game = Game_Instance()
+    game = Visual_Game_Instance()
     game.run()
