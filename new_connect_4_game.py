@@ -387,7 +387,7 @@ class Game:
         self.computer = ComputerPlayer('normal')
         self.win = False
         self.winner = False
-        self.play()
+        # self.play()
 
     def play(self):
         if random.choice([1,2]) == 2:
@@ -432,9 +432,8 @@ class Game:
 
 
 
-game = Game()
-
 '''
+game = Game()
 board = Board(7, 6)
 computer = ComputerPlayer('random')
 print(board)
@@ -444,11 +443,11 @@ computer.check_for_lose(board)
 
 class Visual_Game_Instance:
     def __init__(self):
-        # Load in game state
+        # Create game state
         self.game = Game()
         # Game settings
-        self.ROWS = self.game.board.rows
-        self.COLS = self.game.board.columns
+        self.ROWS = self.game.board.rows # Can load in as static as these won't/shouldn't change
+        self.COLS = self.game.board.columns # Can load in as static as these won't/shouldn't change
 
         # Game visuals
         self.GRID_SIZE = 100 # Should be static, width/height of each cell in the grid
@@ -467,9 +466,9 @@ class Visual_Game_Instance:
         pygame.display.set_caption("Connect 4")
 
         # Game state
-        self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)] # TODO: Ensure this only relates to rendering
+        # self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)] # TODO: Ensure this only relates to rendering
         self.running = True
-        self.current_player = 1 # Player 1 starts #TODO: Have this dictated by game logic
+        self.current_player = 'A' # Player 1 starts #TODO: Have this dictated by game logic
 
 
     def draw_board(self):
@@ -479,17 +478,17 @@ class Visual_Game_Instance:
                 pygame.draw.rect(
                     self.screen, 
                     self.BLUE, 
-                    (row * self.GRID_SIZE, col * self.GRID_SIZE + self.GRID_SIZE, self.GRID_SIZE, self.GRID_SIZE)
+                    (col * self.GRID_SIZE, row * self.GRID_SIZE + self.GRID_SIZE, self.GRID_SIZE, self.GRID_SIZE)
                 )
                 color = self.BLACK
-                if self.game.board[col][row] == 1:
+                if self.game.board.grid[col][row] == 'A':
                     color = self.RED
-                elif self.game.board[col][row] == 2:
+                elif self.game.board.grid[col][row] == 'B':
                     color = self.YELLOW
                 pygame.draw.circle(
                     self.screen, 
                     color, 
-                    (row * self.GRID_SIZE + self.GRID_SIZE // 2, col * self.GRID_SIZE + self.GRID_SIZE + self.GRID_SIZE // 2), 
+                    (col * self.GRID_SIZE + self.GRID_SIZE // 2, row * self.GRID_SIZE + self.GRID_SIZE + self.GRID_SIZE // 2), 
                     self.RADIUS,
                 )
 
@@ -499,28 +498,57 @@ class Visual_Game_Instance:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == 'A':
                 col = event.pos[0] // self.GRID_SIZE
                 if self.is_valid_location(col):
+                    # self.game.board.add_coin(col + 1, self.current_player)
                     row = self.get_next_open_row(col)
                     # Animate the chip falling
                     self.animate_chip_fall(col, row, self.current_player)
-                    self.board[row][col] = self.current_player
+                    self.game.board.add_coin(col + 1, self.current_player)
+                    # self.board[row][col] = self.current_player
+                    '''
                     if self.check_win(self.current_player):
                         print(f"Player {self.current_player} wins!")
                         self.running = False
-                    self.current_player = 3 - self.current_player # Switch player
+                    '''
+                    # Check for win or switch turns
+                    self.game.check_win()
+                    if self.game.win:
+                        print(f"Player {self.current_player} wins!")
+                        self.running = False
+                    else:
+                        self.current_player = 'B'  # Switch to computer
+                        self.computer_turn()
+
+    def computer_turn(self):
+        # Handle the computer's move.
+        print("Computer's turn...")
+        computer_move = self.game.computer.make_move(self.game.board)
+        if computer_move is not None:
+            row = self.get_next_open_row(computer_move)
+            self.animate_chip_fall(computer_move, row, 'B')
+            self.game.board.add_coin(computer_move + 1, 'B')
+
+            # Check for win or switch back to player
+            self.game.check_win()
+            if self.game.win:
+                print(f"Player {self.current_player} wins!")
+                self.running = False
+            else:
+                self.current_player = 'A'  # Switch back to player
+
 
     
     def is_valid_location(self, col):
         """Check if the column is a valid move."""
-        return self.board[0][col] == 0
+        return self.game.board.grid[col][0] == 0
     
 
     def get_next_open_row(self, col):
         """Get the next open row in the column."""
         for row in range(self.ROWS -1, -1, -1):
-            if self.board[row][col] == 0:
+            if self.game.board.grid[col][row] == 0:
                 return row
             
 
@@ -533,13 +561,13 @@ class Visual_Game_Instance:
             self.draw_board()  # Redraw the current board
 
             # Draw the falling chip
-            pygame.draw.circle(self.screen, self.RED if player == 1 else self.YELLOW, (x, y), self.RADIUS)
+            pygame.draw.circle(self.screen, self.RED if player == 'A' else self.YELLOW, (x, y), self.RADIUS)
 
             pygame.display.update()
             pygame.time.delay(20)  # Control animation speed
             y += 10
             
-    
+    '''
     def check_win(self, player):
         #TODO: Refactor this, as want to use game logic to determine win
         """Check if the current player has won."""
@@ -564,7 +592,8 @@ class Visual_Game_Instance:
                 if all(self.board[row - i][col + i] == player for i in range(4)):
                     return True
         return False
-
+    '''
+        
 
     def run(self):
         """Main game loop."""
@@ -576,3 +605,8 @@ class Visual_Game_Instance:
 
         pygame.quit()
         sys.exit()
+
+
+if __name__ == "__main__":
+    game = Visual_Game_Instance()
+    game.run()
