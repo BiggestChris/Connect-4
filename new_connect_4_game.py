@@ -335,6 +335,14 @@ class ComputerPlayer:
                 )):
                     moves.append(z - 1)
                     moves.append(z + 2)
+                elif (board.grid[z][-1] == 'A'
+                and board.grid[z + 2][-1] == 'A'
+                and (
+                    board.grid[z - 1][-1] == 0
+                    and board.grid[z + 1][-1] == 0
+                    and board.grid[z + 3][-1] == 0
+                )):
+                    moves.append(z + 1)
             except IndexError:
                 continue
         return moves
@@ -389,6 +397,10 @@ class Game:
         self.winner = False
         # self.play()
 
+    '''
+    Below is a method to play the game in terminal leaving it in in case it may ever be needed for debugging, but
+    leaving it in as could be useful for trouble-shooting in the future
+    '''
     def play(self):
         if random.choice([1,2]) == 2:
             print('Computer starts')
