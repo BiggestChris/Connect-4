@@ -527,8 +527,13 @@ class Visual_Game_Instance:
                     # Check for win or switch turns
                     self.game.check_win()
                     if self.game.win:
-                        print(f"Player {self.current_player} wins!")
-                        self.running = False
+                        # Load the font and set size (can also use default font)
+                        font = pygame.font.Font(None, 36)  # None uses the default font; 36 is font size
+                        text_surface = font.render(f"Player {self.current_player} wins!", True, (255, 255, 255))  # White color text
+                        self.screen.blit(text_surface, (100, 100))  # Coordinates where the text appears
+                        pygame.display.flip()  # Update the display
+                        # print(f"Player {self.current_player} wins!")
+                        # self.running = False
                     else:
                         self.current_player = 'B'  # Switch to computer
                         self.computer_turn()
@@ -546,7 +551,7 @@ class Visual_Game_Instance:
             self.game.check_win()
             if self.game.win:
                 print(f"Player {self.current_player} wins!")
-                self.running = False
+                # self.running = False
             else:
                 self.current_player = 'A'  # Switch back to player
 
@@ -622,3 +627,12 @@ class Visual_Game_Instance:
 if __name__ == "__main__":
     game = Visual_Game_Instance()
     game.run()
+
+
+'''
+    What is still neededed?
+    1. A start menu, want to be able to pick 1-player or 2-player. Want to pick computer difficulty.
+    2. Clear win or lose relay in the game, then bring people back to main menu. Need to change rendering logic
+    as currently board is being redrawn which overrides text.
+    3. Multiple computer difficulties (Easy/Medium/Hard seems sensible).
+'''
