@@ -479,6 +479,7 @@ class Visual_Game_Instance:
 
         # Game state
         # self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)] # TODO: Ensure this only relates to rendering
+        self.state = "menu"  # Start in the menu state
         self.running = True
         self.current_player = 'A' # Player 1 starts #TODO: Have this dictated by game logic
 
@@ -610,21 +611,53 @@ class Visual_Game_Instance:
     def run(self):
         """Main game loop."""
         while self.running:
-            self.screen.fill(self.BLACK)
-            self.handle_events()
-            self.draw_board() # Always draw the board
-
-            if self.game.win:
-                # Render the winning text
-                font = pygame.font.Font(None, 48)
-                text_surface = font.render(f"Player {'A' if self.game.winner == 4 else 'B'} wins!", True, (255, 255, 255))
-                text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.GRID_SIZE // 2))
-                self.screen.blit(text_surface, text_rect)
+            if self.state == "menu":
+                self.main_menu()
+            elif self.state == "play":
+                self.play_game()
+            elif self.state == "exit":
+                self.running = False
             
             pygame.display.update()
 
         pygame.quit()
         sys.exit()
+
+
+    def main_menu(self):
+        """Main Menu logic."""
+        font = pygame.font.Font(None, 48)
+        menu_text = font.render("Main Menu - Press P to Play or Q to Quit", True, (255, 255, 255))
+        text_rect = menu_text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
+        
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(menu_text, text_rect)
+        pygame.display.flip()
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.state = "exit"
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    self.state = "play"
+                elif event.key == pygame.K_q:
+                    self.state = "exit"
+
+
+    def play_game(self):
+        self.screen.fill(self.BLACK)
+        self.handle_events()
+        self.draw_board() # Always draw the board
+
+        if self.game.win:
+            # Render the winning text
+            font = pygame.font.Font(None, 48)
+            text_surface = font.render(f"Player {'A' if self.game.winner == 4 else 'B'} wins!", True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.GRID_SIZE // 2))
+            self.screen.blit(text_surface, text_rect)
+        
+        pygame.display.update()
 
 
 if __name__ == "__main__":
@@ -635,7 +668,6 @@ if __name__ == "__main__":
 '''
     What is still neededed?
     1. A start menu, want to be able to pick 1-player or 2-player. Want to pick computer difficulty.
-    2. Clear win or lose relay in the game, then bring people back to main menu. Need to change rendering logic
-    as currently board is being redrawn which overrides text.
+    2. Clear win or lose relay in the game, then bring people back to main menu.
     3. Multiple computer difficulties (Easy/Medium/Hard seems sensible).
 '''
