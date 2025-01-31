@@ -512,7 +512,7 @@ class Visual_Game_Instance:
                 self.running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == 'A':
                 col = event.pos[0] // self.GRID_SIZE
-                if self.is_valid_location(col):
+                if self.is_valid_location(col) and self.game.win == False:
                     # self.game.board.add_coin(col + 1, self.current_player)
                     row = self.get_next_open_row(col)
                     # Animate the chip falling
@@ -527,12 +527,7 @@ class Visual_Game_Instance:
                     # Check for win or switch turns
                     self.game.check_win()
                     if self.game.win:
-                        # Load the font and set size (can also use default font)
-                        font = pygame.font.Font(None, 36)  # None uses the default font; 36 is font size
-                        text_surface = font.render(f"Player {self.current_player} wins!", True, (255, 255, 255))  # White color text
-                        self.screen.blit(text_surface, (100, 100))  # Coordinates where the text appears
-                        pygame.display.flip()  # Update the display
-                        # print(f"Player {self.current_player} wins!")
+                        break
                         # self.running = False
                     else:
                         self.current_player = 'B'  # Switch to computer
@@ -617,7 +612,15 @@ class Visual_Game_Instance:
         while self.running:
             self.screen.fill(self.BLACK)
             self.handle_events()
-            self.draw_board()
+            self.draw_board() # Always draw the board
+
+            if self.game.win:
+                # Render the winning text
+                font = pygame.font.Font(None, 48)
+                text_surface = font.render(f"Player {'A' if self.game.winner == 4 else 'B'} wins!", True, (255, 255, 255))
+                text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.GRID_SIZE // 2))
+                self.screen.blit(text_surface, text_rect)
+            
             pygame.display.update()
 
         pygame.quit()
