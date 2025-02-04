@@ -349,6 +349,7 @@ class ComputerPlayer:
 
 
     def check_move(self, board):
+        # TODO: Don't let computer make invalid move
         # dummy_board = copy.deepcopy(board)
         choice_scores = []
         for column_index in range(len(board.grid)):
@@ -516,6 +517,7 @@ class Visual_Game_Instance:
                 if self.is_valid_location(col) and self.game.win == False:
                     # self.game.board.add_coin(col + 1, self.current_player)
                     row = self.get_next_open_row(col)
+                    print(f"Player target_row: {row}")
                     # Animate the chip falling
                     self.animate_chip_fall(col, row, self.current_player)
                     self.game.board.add_coin(col + 1, self.current_player)
@@ -540,6 +542,7 @@ class Visual_Game_Instance:
         computer_move = self.game.computer.make_move(self.game.board)
         if computer_move is not None:
             row = self.get_next_open_row(computer_move)
+            print(f"Computer target_row: {row}")
             self.animate_chip_fall(computer_move, row, 'B')
             self.game.board.add_coin(computer_move + 1, 'B')
 
@@ -569,7 +572,7 @@ class Visual_Game_Instance:
         """Animates the chip falling down to the target row."""
         x = col * self.GRID_SIZE + self.GRID_SIZE // 2
         y = self.GRID_SIZE // 2
-        while y < target_row * self.GRID_SIZE + self.GRID_SIZE // 2:
+        while y < (target_row * self.GRID_SIZE + self.GRID_SIZE // 2):
             self.screen.fill(self.BLACK)  # Clear the screen
             self.draw_board()  # Redraw the current board
 
@@ -670,4 +673,5 @@ if __name__ == "__main__":
     1. A start menu, want to be able to pick 1-player or 2-player. Want to pick computer difficulty.
     2. Clear win or lose relay in the game, then bring people back to main menu.
     3. Multiple computer difficulties (Easy/Medium/Hard seems sensible).
+    4. Set up for Pygbag
 '''
