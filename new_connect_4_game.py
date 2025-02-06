@@ -223,18 +223,22 @@ class ComputerPlayer:
             case 'random':
                 return random.choice(valid_columns)
             case 'normal':
-                wins = self.check_for_win(board)
+                # wins = self.check_for_win(board)
+                wins = [col for col in self.check_for_win(board) if col in valid_columns]
                 if wins:
                     # print('Pick win')
                     return random.choice(wins)
-                loses = self.check_for_lose(board)
+                # loses = self.check_for_lose(board)
+                loses = [col for col in self.check_for_lose(board) if col in valid_columns]
                 if loses:
-                    print('Pick avoid lose')
+                    # print('Pick avoid lose')
                     return random.choice(loses)
-                fools = self.check_for_fool(board)
+                # fools = self.check_for_fool(board)
+                fools = [col for col in self.check_for_fool(board) if col in valid_columns]
                 if fools:
                     return random.choice(fools)
                 moves = self.check_move(board)
+                best_move = moves if moves in valid_columns else random.choice(valid_columns)
                 print(moves)
                 return moves
 
@@ -385,6 +389,7 @@ class ComputerPlayer:
         # new_dummy_board = copy.deepycopy(dummy_board.add_coin((choice_scores.index(min(choice_scores)) + 1), 'B'))
         # self.check_for_lose(new_dummy_board)
 
+        # TODO: Need to revise below so it returns a list, going from lowest scores to highest scores, rather than a single value
         return choice_scores.index(min(choice_scores))
 
 
