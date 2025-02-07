@@ -218,7 +218,7 @@ class ComputerPlayer:
 
     def make_move(self, board):
         valid_columns = [col for col in range(len(board.grid)) if board.grid[col][0] == 0]
-        # print(valid_columns)
+        print(f'Valid columns are: ', valid_columns)
         match self.difficulty:
             case 'random':
                 return random.choice(valid_columns)
@@ -238,9 +238,13 @@ class ComputerPlayer:
                 if fools:
                     return random.choice(fools)
                 moves = self.check_move(board)
-                best_move = moves if moves in valid_columns else random.choice(valid_columns)
-                print(moves)
-                return moves
+
+                for move in moves:
+                    if move in valid_columns:
+                        return move
+
+                print('No more valid moves')
+                return 'X'
 
         
     '''
@@ -388,9 +392,13 @@ class ComputerPlayer:
         # check this move won't cause a lose
         # new_dummy_board = copy.deepycopy(dummy_board.add_coin((choice_scores.index(min(choice_scores)) + 1), 'B'))
         # self.check_for_lose(new_dummy_board)
+        print(f'Choice scores is: ', choice_scores)
+        # Get indices sorted by score from min to max
+        sorted_indices = [index for index, _ in sorted(enumerate(choice_scores), key=lambda x: x[1])]
+        
+        return sorted_indices
 
-        # TODO: Need to revise below so it returns a list, going from lowest scores to highest scores, rather than a single value
-        return choice_scores.index(min(choice_scores))
+        # return choice_scores.index(min(choice_scores))
 
 
 
@@ -546,18 +554,21 @@ class Visual_Game_Instance:
         print("Computer's turn...")
         computer_move = self.game.computer.make_move(self.game.board)
         if computer_move is not None:
-            row = self.get_next_open_row(computer_move)
-            print(f"Computer target_row: {row}")
-            self.animate_chip_fall(computer_move, row, 'B')
-            self.game.board.add_coin(computer_move + 1, 'B')
-
-            # Check for win or switch back to player
-            self.game.check_win()
-            if self.game.win:
-                print(f"Player {self.current_player} wins!")
-                # self.running = False
+            if computer_move == 'X':
+                print('Game draw')
             else:
-                self.current_player = 'A'  # Switch back to player
+                row = self.get_next_open_row(computer_move)
+                print(f"Computer target_row: {row}")
+                self.animate_chip_fall(computer_move, row, 'B')
+                self.game.board.add_coin(computer_move + 1, 'B')
+
+                # Check for win or switch back to player
+                self.game.check_win()
+                if self.game.win:
+                    print(f"Player {self.current_player} wins!")
+                    # self.running = False
+                else:
+                    self.current_player = 'A'  # Switch back to player
 
 
     
