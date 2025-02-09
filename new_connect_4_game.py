@@ -495,7 +495,8 @@ class Visual_Game_Instance:
         # self.board = [[0 for _ in range(self.COLS)] for _ in range(self.ROWS)] # TODO: Ensure this only relates to rendering
         self.state = "menu"  # Start in the menu state
         self.running = True
-        self.current_player = 'A' # Player 1 starts #TODO: Have this dictated by game logic
+        self.current_player = random.choice(['A','B'])
+        # self.current_player = 'A' # Player 1 starts #TODO: Have this dictated by game logic
 
 
     def draw_board(self):
@@ -525,6 +526,8 @@ class Visual_Game_Instance:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif self.current_player == 'B':
+                self.computer_turn()
             elif event.type == pygame.MOUSEBUTTONDOWN and self.current_player == 'A':
                 col = event.pos[0] // self.GRID_SIZE
                 if self.is_valid_location(col) and self.game.win == False:
@@ -547,11 +550,12 @@ class Visual_Game_Instance:
                         # self.running = False
                     else:
                         self.current_player = 'B'  # Switch to computer
-                        self.computer_turn()
 
     def computer_turn(self):
         # Handle the computer's move.
         print("Computer's turn...")
+        if self.game.win:
+            return
         computer_move = self.game.computer.make_move(self.game.board)
         if computer_move is not None:
             if computer_move == 'X':
@@ -583,6 +587,14 @@ class Visual_Game_Instance:
             if self.game.board.grid[col][row] == 0:
                 return row
             
+
+    def check_draw(self):
+        """Check if the board is full without a winner."""
+        for col in range(self.COLS):
+            if self.is_valid_location(col):
+                return False  # There's still space for a move
+        return True  # No more valid moves, it's a draw
+
 
     def animate_chip_fall(self, col, target_row, player):
         """Animates the chip falling down to the target row."""
@@ -659,6 +671,8 @@ class Visual_Game_Instance:
                 self.state = "exit"
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
+                    self.game = Game()
+                    self.current_player = random.choice(['A','B'])
                     self.state = "play"
                 elif event.key == pygame.K_q:
                     self.state = "exit"
@@ -666,8 +680,6 @@ class Visual_Game_Instance:
 
     def play_game(self):
         self.screen.fill(self.BLACK)
-        self.handle_events()
-        self.draw_board() # Always draw the board
 
         if self.game.win:
             # Render the winning text
@@ -675,7 +687,31 @@ class Visual_Game_Instance:
             text_surface = font.render(f"Player {'A' if self.game.winner == 4 else 'B'} wins!", True, (255, 255, 255))
             text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.GRID_SIZE // 2))
             self.screen.blit(text_surface, text_rect)
+            self.draw_board()
+            pygame.display.update()
+
+            # Pause for a few seconds, then return to the menu
+            pygame.time.wait(2000)
+            self.state = "menu"
+            return
+        elif self.check_draw():
+            # Render the draw text
+            font = pygame.font.Font(None, 48)
+            text_surface = font.render("It's a draw!", True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.GRID_SIZE // 2))
+            self.screen.blit(text_surface, text_rect)
+            self.draw_board()
+            pygame.display.update()
+
+            # Pause for a few seconds, then return to the menu
+            pygame.time.wait(2000)
+            self.state = "menu"
+            return
+        else:
+            self.handle_events()
         
+        self.draw_board() # Always draw the board
+
         pygame.display.update()
 
 
